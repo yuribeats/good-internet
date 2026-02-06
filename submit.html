@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SUBMIT PROJECT — THE GOOD INTERNET</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      border-radius: 0 !important;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 900;
+      text-transform: uppercase;
+      background: #fff;
+      color: #000;
+      padding: 20px;
+    }
+
+    a {
+      color: #000;
+    }
+
+    header {
+      border-bottom: 1px solid #000;
+      padding-bottom: 20px;
+      margin-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 48px;
+      font-weight: 900;
+      letter-spacing: 2px;
+    }
+
+    h2 {
+      font-size: 24px;
+      font-weight: 900;
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 900;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"],
+    input[type="url"] {
+      width: 100%;
+      max-width: 500px;
+      padding: 10px;
+      border: 1px solid #000;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 900;
+      font-size: 14px;
+      text-transform: uppercase;
+      background: #fff;
+      color: #000;
+      outline: none;
+      border-radius: 0;
+    }
+
+    input[type="text"]:focus,
+    input[type="url"]:focus {
+      background: #000;
+      color: #fff;
+    }
+
+    .tags-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag-checkbox {
+      display: none;
+    }
+
+    .tag-label {
+      display: inline-block;
+      padding: 8px 16px;
+      border: 1px solid #000;
+      font-size: 14px;
+      font-weight: 900;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .tag-checkbox:checked + .tag-label {
+      background: #000;
+      color: #fff;
+    }
+
+    .tag-label:hover {
+      background: #000;
+      color: #fff;
+    }
+
+    button[type="submit"] {
+      margin-top: 20px;
+      padding: 12px 24px;
+      border: 1px solid #000;
+      background: #000;
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 900;
+      font-size: 16px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 0;
+    }
+
+    button[type="submit"]:hover {
+      background: #fff;
+      color: #000;
+    }
+
+    .message {
+      margin-top: 20px;
+      padding: 16px;
+      border: 1px solid #000;
+      font-size: 14px;
+      display: none;
+    }
+
+    .message.success {
+      display: block;
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 20px;
+      font-size: 14px;
+      font-weight: 900;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="index.html"><h1>THE GOOD INTERNET</h1></a>
+  </header>
+
+  <h2>SUBMIT A PROJECT</h2>
+
+  <form id="submitForm">
+    <div class="form-group">
+      <label for="name">PROJECT NAME</label>
+      <input type="text" id="name" name="name" required>
+    </div>
+
+    <div class="form-group">
+      <label for="url">PROJECT URL</label>
+      <input type="url" id="url" name="url" required>
+    </div>
+
+    <div class="form-group">
+      <label for="submittedBy">YOUR NAME</label>
+      <input type="text" id="submittedBy" name="submittedBy" required>
+    </div>
+
+    <div class="form-group">
+      <label>TAGS</label>
+      <div class="tags-group">
+        <input type="checkbox" class="tag-checkbox" id="tag-whimsy" value="WHIMSY">
+        <label for="tag-whimsy" class="tag-label">WHIMSY</label>
+
+        <input type="checkbox" class="tag-checkbox" id="tag-beauty" value="BEAUTY">
+        <label for="tag-beauty" class="tag-label">BEAUTY</label>
+
+        <input type="checkbox" class="tag-checkbox" id="tag-productivity" value="PRODUCTIVITY">
+        <label for="tag-productivity" class="tag-label">PRODUCTIVITY</label>
+
+        <input type="checkbox" class="tag-checkbox" id="tag-profit" value="PROFIT">
+        <label for="tag-profit" class="tag-label">PROFIT</label>
+
+        <input type="checkbox" class="tag-checkbox" id="tag-vibes" value="VIBES">
+        <label for="tag-vibes" class="tag-label">VIBES</label>
+      </div>
+    </div>
+
+    <button type="submit">SUBMIT</button>
+  </form>
+
+  <div class="message" id="message"></div>
+
+  <a href="index.html" class="back-link">&larr; BACK TO PROJECTS</a>
+
+  <script>
+    document.getElementById('submitForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById('name').value.trim();
+      const url = document.getElementById('url').value.trim();
+      const submittedBy = document.getElementById('submittedBy').value.trim();
+      const tags = Array.from(document.querySelectorAll('.tag-checkbox:checked'))
+        .map(cb => cb.value);
+
+      if (!name || !url || !submittedBy) return;
+      if (tags.length === 0) {
+        const msg = document.getElementById('message');
+        msg.textContent = 'SELECT AT LEAST ONE TAG';
+        msg.classList.add('success');
+        return;
+      }
+
+      const btn = document.querySelector('button[type="submit"]');
+      btn.disabled = true;
+      btn.textContent = 'SUBMITTING...';
+
+      try {
+        const res = await fetch('/api/projects', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, url, submittedBy, tags })
+        });
+
+        if (res.ok) {
+          const msg = document.getElementById('message');
+          msg.textContent = 'PROJECT SUBMITTED. THANK YOU.';
+          msg.classList.add('success');
+          document.getElementById('submitForm').reset();
+        } else {
+          throw new Error('Failed');
+        }
+      } catch (err) {
+        const msg = document.getElementById('message');
+        msg.textContent = 'SOMETHING WENT WRONG. TRY AGAIN.';
+        msg.classList.add('success');
+      }
+
+      btn.disabled = false;
+      btn.textContent = 'SUBMIT';
+    });
+  </script>
+</body>
+</html>
