@@ -1,35 +1,30 @@
-import { Redis } from '@upstash/redis';
-
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN,
-});
+const { Redis } = require('@upstash/redis');
 
 const PROJECTS_KEY = 'good-internet:projects';
-
 const VALID_TAGS = ['WHIMSY', 'BEAUTY', 'PRODUCTIVITY', 'PROFIT', 'VIBES'];
 
-export default async function handler(req, res) {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+module.exports = async function handler(req, res) {
+  try {
+    const redis = new Redis({
+      url: (process.env.KV_REST_API_URL || '').trim(),
+      token: (process.env.KV_REST_API_TOKEN || '').trim(),
+    });
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  if (req.method === 'GET') {
-    try {
+    if (req.method === 'OPTIONS') {
+      return res.status(200).end();
+    }
+
+    if (req.method === 'GET') {
       const projects = await redis.lrange(PROJECTS_KEY, 0, -1);
       const parsed = projects.map(p => typeof p === 'string' ? JSON.parse(p) : p);
       return res.status(200).json({ projects: parsed });
-    } catch (e) {
-      return res.status(500).json({ error: 'Failed to fetch projects' });
     }
-  }
 
-  if (req.method === 'POST') {
-    try {
+    if (req.method === 'POST') {
       const { name, url, submittedBy, tags } = req.body;
 
       if (!name || !url || !submittedBy || !tags || !Array.isArray(tags) || tags.length === 0) {
@@ -55,10 +50,11 @@ export default async function handler(req, res) {
 
       await redis.lpush(PROJECTS_KEY, JSON.stringify(project));
       return res.status(200).json({ success: true, project });
-    } catch (e) {
-      return res.status(500).json({ error: 'Failed to save project' });
     }
-  }
 
-  return res.status(405).json({ error: 'Method not allowed' });
-}
+    return res.status(405).json({ error: 'Method not allowed' });
+  } catch (e) {
+    console.error('Handler error:', e.message, e.stack);
+    return res.status(500).json({ error: e.message });
+  }
+};
