@@ -1,7 +1,7 @@
 const { Redis } = require('@upstash/redis');
 
 const PROJECTS_KEY = 'good-internet:projects';
-const VALID_TAGS = ['WHIMSY', 'BEAUTY', 'PRODUCTIVITY', 'PROFIT', 'VIBES'];
+const VALID_TAGS = ['WHIMSY', 'BEAUTY', 'PRODUCTIVITY', 'PROFIT', 'VIBES', 'PERSONAL'];
 
 module.exports = async function handler(req, res) {
   try {
@@ -11,7 +11,7 @@ module.exports = async function handler(req, res) {
     });
 
     res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
     if (req.method === 'OPTIONS') {
@@ -50,6 +50,17 @@ module.exports = async function handler(req, res) {
 
       await redis.lpush(PROJECTS_KEY, JSON.stringify(project));
       return res.status(200).json({ success: true, project });
+    }
+
+    if (req.method === 'DELETE') {
+      const { index } = req.body;
+      if (typeof index !== 'number') {
+        return res.status(400).json({ error: 'Missing index' });
+      }
+      const TOMBSTONE = '__DELETED__';
+      await redis.lset(PROJECTS_KEY, index, TOMBSTONE);
+      await redis.lrem(PROJECTS_KEY, 1, TOMBSTONE);
+      return res.status(200).json({ success: true });
     }
 
     return res.status(405).json({ error: 'Method not allowed' });

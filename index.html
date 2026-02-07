@@ -135,6 +135,41 @@
       text-decoration: none;
     }
 
+    .sort-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .sort-label {
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .sort-btn {
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 900;
+      font-size: 12px;
+      text-transform: uppercase;
+      padding: 6px 12px;
+      border: 1px solid #000;
+      background: #fff;
+      color: #000;
+      cursor: pointer;
+      border-radius: 0;
+    }
+
+    .sort-btn:hover {
+      background: #000;
+      color: #fff;
+    }
+
+    .sort-btn.active {
+      background: #000;
+      color: #fff;
+    }
+
     .empty {
       padding: 40px;
       text-align: center;
@@ -161,6 +196,13 @@
     <button class="filter-btn" data-tag="PRODUCTIVITY">PRODUCTIVITY</button>
     <button class="filter-btn" data-tag="PROFIT">PROFIT</button>
     <button class="filter-btn" data-tag="VIBES">VIBES</button>
+    <button class="filter-btn" data-tag="PERSONAL">PERSONAL</button>
+  </div>
+
+  <div class="sort-bar">
+    <span class="sort-label">SORT:</span>
+    <button class="sort-btn active" data-sort="DATE">DATE</button>
+    <button class="sort-btn" data-sort="AUTHOR">AUTHOR</button>
   </div>
 
   <div id="projects" class="project-list">
@@ -172,6 +214,7 @@
   <script>
     let allProjects = [];
     let activeFilter = 'ALL';
+    let activeSort = 'DATE';
 
     async function fetchProjects() {
       try {
@@ -185,11 +228,21 @@
       }
     }
 
+    function sortProjects(list) {
+      return list.slice().sort(function(a, b) {
+        if (activeSort === 'AUTHOR') {
+          return (a.submittedBy || '').localeCompare(b.submittedBy || '');
+        }
+        return (b.timestamp || 0) - (a.timestamp || 0);
+      });
+    }
+
     function renderProjects() {
       const container = document.getElementById('projects');
-      const filtered = activeFilter === 'ALL'
+      let filtered = activeFilter === 'ALL'
         ? allProjects
         : allProjects.filter(p => p.tags && p.tags.includes(activeFilter));
+      filtered = sortProjects(filtered);
 
       if (filtered.length === 0) {
         container.innerHTML = '<div class="empty">NO PROJECTS YET</div>';
@@ -220,6 +273,15 @@
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         activeFilter = btn.dataset.tag;
+        renderProjects();
+      });
+    });
+
+    document.querySelectorAll('.sort-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        activeSort = btn.dataset.sort;
         renderProjects();
       });
     });

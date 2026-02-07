@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ADMIN — THE GOOD INTERNET</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      border-radius: 0 !important;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 900;
+      text-transform: uppercase;
+      background: #fff;
+      color: #000;
+      padding: 20px;
+    }
+
+    a { color: #000; }
+
+    header {
+      border-bottom: 1px solid #000;
+      padding-bottom: 20px;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    h1 {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: 2px;
+    }
+
+    .back-link {
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 1px;
+    }
+
+    .count {
+      font-size: 12px;
+      margin-bottom: 20px;
+    }
+
+    .project {
+      border: 1px solid #000;
+      padding: 16px;
+      margin-bottom: -1px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .project-info {
+      flex: 1;
+    }
+
+    .project-name {
+      font-size: 16px;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+
+    .project-url {
+      font-size: 11px;
+      color: #666;
+      word-break: break-all;
+    }
+
+    .project-meta {
+      font-size: 11px;
+      margin-top: 4px;
+    }
+
+    .project-tags {
+      display: inline-flex;
+      gap: 4px;
+      margin-left: 8px;
+    }
+
+    .tag {
+      font-size: 9px;
+      font-weight: 900;
+      padding: 2px 6px;
+      border: 1px solid #000;
+    }
+
+    .remove-btn {
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 900;
+      font-size: 11px;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      border: 1px solid #000;
+      background: #fff;
+      color: #000;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .remove-btn:hover {
+      background: #000;
+      color: #fff;
+    }
+
+    .empty {
+      padding: 40px;
+      text-align: center;
+      border: 1px solid #000;
+      font-size: 14px;
+    }
+
+    .gate {
+      min-height: 60vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gate-box { text-align: center; }
+
+    .gate-input {
+      width: 240px;
+      padding: 10px;
+      border: 1px solid #000;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 900;
+      font-size: 14px;
+      text-transform: uppercase;
+      text-align: center;
+      outline: none;
+      background: #fff;
+      color: #000;
+    }
+
+    .gate-input:focus { background: #000; color: #fff; }
+
+    .gate-btn {
+      display: block;
+      width: 240px;
+      margin-top: 12px;
+      padding: 10px;
+      border: 1px solid #000;
+      background: #000;
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 900;
+      font-size: 14px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .gate-btn:hover { background: #fff; color: #000; }
+
+    .gate-error {
+      margin-top: 12px;
+      font-size: 11px;
+      color: #999;
+      height: 16px;
+    }
+
+    .content { display: none; }
+  </style>
+</head>
+<body>
+  <div class="gate" id="gate">
+    <div class="gate-box">
+      <input type="password" class="gate-input" id="passInput" placeholder="PASSWORD" autocomplete="off">
+      <button class="gate-btn" id="passBtn">ENTER</button>
+      <div class="gate-error" id="passError"></div>
+    </div>
+  </div>
+
+  <div class="content" id="content">
+    <header>
+      <h1>ADMIN</h1>
+      <a href="index.html" class="back-link">&larr; BACK</a>
+    </header>
+
+    <div class="count" id="count"></div>
+    <div id="projects"></div>
+  </div>
+
+  <script>
+    document.getElementById('passBtn').addEventListener('click', checkPass);
+    document.getElementById('passInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') checkPass();
+    });
+    document.getElementById('passInput').focus();
+
+    function checkPass() {
+      if (document.getElementById('passInput').value.toLowerCase() === 'oldfriends') {
+        document.getElementById('gate').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+        load();
+      } else {
+        document.getElementById('passError').textContent = 'WRONG PASSWORD';
+        document.getElementById('passInput').value = '';
+        document.getElementById('passInput').focus();
+      }
+    }
+    var projects = [];
+
+    function esc(s) {
+      var d = document.createElement('div');
+      d.textContent = s || '';
+      return d.innerHTML;
+    }
+
+    function load() {
+      fetch('/api/projects').then(function(r) { return r.json(); }).then(function(data) {
+        projects = data.projects || [];
+        render();
+      });
+    }
+
+    function render() {
+      var el = document.getElementById('projects');
+      document.getElementById('count').textContent = projects.length + ' PROJECTS';
+
+      if (projects.length === 0) {
+        el.innerHTML = '<div class="empty">NO PROJECTS</div>';
+        return;
+      }
+
+      el.innerHTML = projects.map(function(p, i) {
+        return '<div class="project">' +
+          '<div class="project-info">' +
+            '<div class="project-name">' + esc(p.name) + '</div>' +
+            '<div class="project-url">' + esc(p.url) + '</div>' +
+            '<div class="project-meta">BY ' + esc(p.submittedBy) +
+              '<span class="project-tags">' +
+                (p.tags || []).map(function(t) { return '<span class="tag">' + esc(t) + '</span>'; }).join('') +
+              '</span>' +
+            '</div>' +
+          '</div>' +
+          '<button class="remove-btn" onclick="remove(' + i + ')">REMOVE</button>' +
+        '</div>';
+      }).join('');
+    }
+
+    function remove(index) {
+      if (!confirm('REMOVE THIS PROJECT?')) return;
+      fetch('/api/projects', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ index: index })
+      }).then(function() {
+        load();
+      });
+    }
+
+  </script>
+</body>
+</html>

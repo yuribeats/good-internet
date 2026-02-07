@@ -23,6 +23,7 @@
 
     a {
       color: #000;
+      text-decoration: none;
     }
 
     header {
@@ -143,6 +144,65 @@
       font-size: 14px;
       font-weight: 900;
     }
+
+    .gate {
+      min-height: 60vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gate-box {
+      text-align: center;
+    }
+
+    .gate-input {
+      width: 240px;
+      padding: 10px;
+      border: 1px solid #000;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 900;
+      font-size: 14px;
+      text-transform: uppercase;
+      text-align: center;
+      outline: none;
+      background: #fff;
+      color: #000;
+    }
+
+    .gate-input:focus {
+      background: #000;
+      color: #fff;
+    }
+
+    .gate-btn {
+      display: block;
+      width: 240px;
+      margin-top: 12px;
+      padding: 10px;
+      border: 1px solid #000;
+      background: #000;
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 900;
+      font-size: 14px;
+      text-transform: uppercase;
+      cursor: pointer;
+    }
+
+    .gate-btn:hover {
+      background: #fff;
+      color: #000;
+    }
+
+    .gate-error {
+      margin-top: 12px;
+      font-size: 11px;
+      color: #999;
+      height: 16px;
+    }
+
+    .content { display: none; }
   </style>
 </head>
 <body>
@@ -150,6 +210,15 @@
     <a href="index.html"><h1>THE GOOD INTERNET</h1></a>
   </header>
 
+  <div class="gate" id="gate">
+    <div class="gate-box">
+      <input type="password" class="gate-input" id="passInput" placeholder="PASSWORD" autocomplete="off">
+      <button class="gate-btn" id="passBtn">ENTER</button>
+      <div class="gate-error" id="passError"></div>
+    </div>
+  </div>
+
+  <div class="content" id="content">
   <h2>SUBMIT A PROJECT</h2>
 
   <form id="submitForm">
@@ -185,6 +254,9 @@
 
         <input type="checkbox" class="tag-checkbox" id="tag-vibes" value="VIBES">
         <label for="tag-vibes" class="tag-label">VIBES</label>
+
+        <input type="checkbox" class="tag-checkbox" id="tag-personal" value="PERSONAL">
+        <label for="tag-personal" class="tag-label">PERSONAL</label>
       </div>
     </div>
 
@@ -194,8 +266,25 @@
   <div class="message" id="message"></div>
 
   <a href="index.html" class="back-link">&larr; BACK TO PROJECTS</a>
+  </div>
 
   <script>
+    document.getElementById('passBtn').addEventListener('click', checkPass);
+    document.getElementById('passInput').addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') checkPass();
+    });
+    document.getElementById('passInput').focus();
+
+    function checkPass() {
+      if (document.getElementById('passInput').value.toLowerCase() === 'oldfriends') {
+        document.getElementById('gate').style.display = 'none';
+        document.getElementById('content').style.display = 'block';
+      } else {
+        document.getElementById('passError').textContent = 'WRONG PASSWORD';
+        document.getElementById('passInput').value = '';
+        document.getElementById('passInput').focus();
+      }
+    }
     document.getElementById('submitForm').addEventListener('submit', async (e) => {
       e.preventDefault();
 
