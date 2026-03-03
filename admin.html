@@ -95,6 +95,36 @@
     .project-desc { font-size: 10px; color: #444; margin-top: 4px; }
     .project-github { font-size: 10px; color: #666; margin-top: 2px; }
     .project-actions { display: flex; gap: 4px; flex-shrink: 0; }
+    .project-img { width: 60px; height: 60px; object-fit: cover; border: 1px solid #000; flex-shrink: 0; }
+
+    .img-upload { display: none; }
+    .img-label {
+      display: inline-block;
+      padding: 8px 16px;
+      border: 1px solid #000;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 900;
+      font-size: 11px;
+      text-transform: uppercase;
+      cursor: pointer;
+      background: #fff;
+      color: #000;
+    }
+    .img-label:hover { background: #000; color: #fff; }
+    .img-preview { height: 40px; margin-top: 4px; border: 1px solid #000; }
+    .img-row { display: flex; align-items: center; gap: 8px; }
+    .img-clear {
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 900;
+      font-size: 9px;
+      text-transform: uppercase;
+      padding: 4px 8px;
+      border: 1px solid #000;
+      background: #fff;
+      color: #000;
+      cursor: pointer;
+    }
+    .img-clear:hover { background: #000; color: #fff; }
 
     .edit-row {
       border: 1px solid #000;
@@ -204,6 +234,15 @@
         <label>DESCRIPTION</label>
         <textarea id="addDesc" rows="2" placeholder="SHORT DESCRIPTION..."></textarea>
       </div>
+      <div class="img-row">
+        <div class="field">
+          <label>IMAGE</label>
+          <input type="file" accept="image/*" class="img-upload" id="addImage">
+          <label for="addImage" class="img-label" id="addImageLabel">CHOOSE IMAGE</label>
+        </div>
+        <img id="addImagePreview" style="display:none" class="img-preview">
+        <button type="button" id="addImageClear" class="img-clear" style="display:none">CLEAR</button>
+      </div>
       <button class="btn" id="addBtn">ADD</button>
     </div>
 
@@ -232,12 +271,51 @@
 
     var projects = [];
     var editingIndex = -1;
+    var addImageData = '';
+    var editImageData = null;
 
     function esc(s) {
       var d = document.createElement('div');
       d.textContent = s || '';
       return d.innerHTML;
     }
+
+    function resizeImage(file, maxW, cb) {
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        var img = new Image();
+        img.onload = function() {
+          var w = img.width, h = img.height;
+          if (w > maxW) { h = Math.round(h * maxW / w); w = maxW; }
+          var c = document.createElement('canvas');
+          c.width = w; c.height = h;
+          c.getContext('2d').drawImage(img, 0, 0, w, h);
+          cb(c.toDataURL('image/jpeg', 0.8));
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    document.getElementById('addImage').addEventListener('change', function(e) {
+      var file = e.target.files[0];
+      if (!file) return;
+      resizeImage(file, 800, function(data) {
+        addImageData = data;
+        document.getElementById('addImagePreview').src = data;
+        document.getElementById('addImagePreview').style.display = 'block';
+        document.getElementById('addImageClear').style.display = 'inline-block';
+        document.getElementById('addImageLabel').textContent = 'CHANGE IMAGE';
+      });
+    });
+
+    document.getElementById('addImageClear').addEventListener('click', function() {
+      addImageData = '';
+      document.getElementById('addImage').value = '';
+      document.getElementById('addImagePreview').style.display = 'none';
+      document.getElementById('addImageClear').style.display = 'none';
+      document.getElementById('addImageLabel').textContent = 'CHOOSE IMAGE';
+    });
 
     function load() {
       fetch('/api/projects').then(function(r) { return r.json(); }).then(function(data) {
@@ -257,6 +335,7 @@
 
       el.innerHTML = projects.map(function(p, i) {
         if (i === editingIndex) {
+          var hasImg = p.image || false;
           return '<div class="edit-row">' +
             '<div class="edit-fields">' +
               '<div class="field"><label>NAME</label><input type="text" id="editName" value="' + esc(p.name) + '"></div>' +
@@ -264,15 +343,25 @@
               '<div class="field"><label>GITHUB</label><input type="url" id="editGithub" value="' + esc(p.github || '') + '"></div>' +
             '</div>' +
             '<div class="field"><label>DESCRIPTION</label><textarea id="editDesc" rows="2">' + esc(p.description || '') + '</textarea></div>' +
+            '<div class="img-row">' +
+              '<div class="field"><label>IMAGE</label>' +
+                '<input type="file" accept="image/*" class="img-upload" id="editImage">' +
+                '<label for="editImage" class="img-label" id="editImageLabel">' + (hasImg ? 'CHANGE IMAGE' : 'CHOOSE IMAGE') + '</label>' +
+              '</div>' +
+              (hasImg ? '<img id="editImagePreview" class="img-preview" src="' + esc(p.image) + '">' : '<img id="editImagePreview" class="img-preview" style="display:none">') +
+              '<button type="button" class="img-clear" style="' + (hasImg ? '' : 'display:none') + '" onclick="clearEditImage()">CLEAR</button>' +
+            '</div>' +
             '<div class="edit-actions">' +
               '<button class="btn" onclick="saveEdit(' + i + ')">SAVE</button>' +
               '<button class="btn-outline" onclick="cancelEdit()">CANCEL</button>' +
             '</div>' +
           '</div>';
         }
+        var img = p.image ? '<img src="' + esc(p.image) + '" class="project-img">' : '';
         var gh = p.github ? '<div class="project-github">' + esc(p.github) + '</div>' : '';
         var desc = p.description ? '<div class="project-desc">' + esc(p.description) + '</div>' : '';
         return '<div class="project">' +
+          img +
           '<div class="project-info">' +
             '<div class="project-name">' + esc(p.name) + '</div>' +
             '<div class="project-url">' + esc(p.url) + '</div>' +
@@ -284,6 +373,34 @@
           '</div>' +
         '</div>';
       }).join('');
+
+      if (editingIndex >= 0) {
+        editImageData = null;
+        var editInput = document.getElementById('editImage');
+        if (editInput) {
+          editInput.addEventListener('change', function(e) {
+            var file = e.target.files[0];
+            if (!file) return;
+            resizeImage(file, 800, function(data) {
+              editImageData = data;
+              var prev = document.getElementById('editImagePreview');
+              prev.src = data;
+              prev.style.display = 'block';
+              prev.nextElementSibling.style.display = 'inline-block';
+              document.getElementById('editImageLabel').textContent = 'CHANGE IMAGE';
+            });
+          });
+        }
+      }
+    }
+
+    function clearEditImage() {
+      editImageData = '';
+      var prev = document.getElementById('editImagePreview');
+      prev.style.display = 'none';
+      prev.nextElementSibling.style.display = 'none';
+      document.getElementById('editImage').value = '';
+      document.getElementById('editImageLabel').textContent = 'CHOOSE IMAGE';
     }
 
     document.getElementById('addBtn').addEventListener('click', function() {
@@ -292,26 +409,36 @@
       var github = document.getElementById('addGithub').value.trim();
       var description = document.getElementById('addDesc').value.trim();
       if (!name || !url) return;
+      var btn = document.getElementById('addBtn');
+      btn.disabled = true; btn.textContent = 'ADDING...';
       fetch('/api/projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: name, url: url, github: github, description: description })
+        body: JSON.stringify({ name: name, url: url, github: github, description: description, image: addImageData })
       }).then(function() {
         document.getElementById('addName').value = '';
         document.getElementById('addUrl').value = '';
         document.getElementById('addGithub').value = '';
         document.getElementById('addDesc').value = '';
+        addImageData = '';
+        document.getElementById('addImage').value = '';
+        document.getElementById('addImagePreview').style.display = 'none';
+        document.getElementById('addImageClear').style.display = 'none';
+        document.getElementById('addImageLabel').textContent = 'CHOOSE IMAGE';
+        btn.disabled = false; btn.textContent = 'ADD';
         load();
       });
     });
 
     function startEdit(i) {
       editingIndex = i;
+      editImageData = null;
       render();
     }
 
     function cancelEdit() {
       editingIndex = -1;
+      editImageData = null;
       render();
     }
 
@@ -321,12 +448,15 @@
       var github = document.getElementById('editGithub').value.trim();
       var description = document.getElementById('editDesc').value.trim();
       if (!name || !url) return;
+      var payload = { index: i, name: name, url: url, github: github, description: description };
+      if (editImageData !== null) payload.image = editImageData;
       fetch('/api/projects', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ index: i, name: name, url: url, github: github, description: description })
+        body: JSON.stringify(payload)
       }).then(function() {
         editingIndex = -1;
+        editImageData = null;
         load();
       });
     }

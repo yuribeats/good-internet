@@ -32,6 +32,7 @@
       align-items: center;
       gap: 12px;
     }
+    .project-img { width: 60px; height: 60px; object-fit: cover; border: 1px solid #000; flex-shrink: 0; }
     .project-left { flex: 1; min-width: 0; }
     .project-name { font-size: 18px; font-weight: 900; }
     .project-desc {
@@ -91,7 +92,9 @@
         if (p.github) {
           links += '<a href="' + esc(p.github) + '" target="_blank">GITHUB</a>';
         }
+        var img = p.image ? '<img src="' + esc(p.image) + '" class="project-img">' : '';
         return '<div class="project">' +
+          img +
           '<div class="project-left">' +
             '<a href="' + esc(p.url) + '" target="_blank" class="project-name">' + esc(p.name) + '</a>' +
             desc +

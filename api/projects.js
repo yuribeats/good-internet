@@ -24,7 +24,7 @@ module.exports = async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
-      const { name, url, github, description } = req.body;
+      const { name, url, github, description, image } = req.body;
       if (!name || !url) {
         return res.status(400).json({ error: 'Missing name or url' });
       }
@@ -33,6 +33,7 @@ module.exports = async function handler(req, res) {
         url: url.trim(),
         github: (github || '').trim(),
         description: (description || '').trim(),
+        image: image || '',
         timestamp: Date.now(),
       };
       await redis.lpush(PROJECTS_KEY, JSON.stringify(project));
@@ -40,7 +41,7 @@ module.exports = async function handler(req, res) {
     }
 
     if (req.method === 'PUT') {
-      const { index, name, url, github, description } = req.body;
+      const { index, name, url, github, description, image } = req.body;
       if (typeof index !== 'number' || !name || !url) {
         return res.status(400).json({ error: 'Missing fields' });
       }
@@ -53,6 +54,7 @@ module.exports = async function handler(req, res) {
         github: (github || '').trim(),
         description: (description || '').trim(),
       };
+      if (typeof image === 'string') updated.image = image;
       await redis.lset(PROJECTS_KEY, index, JSON.stringify(updated));
       return res.status(200).json({ success: true });
     }
