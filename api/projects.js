@@ -24,23 +24,35 @@ module.exports = async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
-      const { name, url } = req.body;
+      const { name, url, github, description } = req.body;
       if (!name || !url) {
         return res.status(400).json({ error: 'Missing name or url' });
       }
-      const project = { name: name.trim(), url: url.trim(), timestamp: Date.now() };
+      const project = {
+        name: name.trim(),
+        url: url.trim(),
+        github: (github || '').trim(),
+        description: (description || '').trim(),
+        timestamp: Date.now(),
+      };
       await redis.lpush(PROJECTS_KEY, JSON.stringify(project));
       return res.status(200).json({ success: true });
     }
 
     if (req.method === 'PUT') {
-      const { index, name, url } = req.body;
+      const { index, name, url, github, description } = req.body;
       if (typeof index !== 'number' || !name || !url) {
         return res.status(400).json({ error: 'Missing fields' });
       }
       const projects = await redis.lrange(PROJECTS_KEY, 0, -1);
       const existing = typeof projects[index] === 'string' ? JSON.parse(projects[index]) : projects[index];
-      const updated = { ...existing, name: name.trim(), url: url.trim() };
+      const updated = {
+        ...existing,
+        name: name.trim(),
+        url: url.trim(),
+        github: (github || '').trim(),
+        description: (description || '').trim(),
+      };
       await redis.lset(PROJECTS_KEY, index, JSON.stringify(updated));
       return res.status(200).json({ success: true });
     }

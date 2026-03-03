@@ -30,13 +30,25 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 12px;
     }
+    .project-left { flex: 1; min-width: 0; }
     .project-name { font-size: 18px; font-weight: 900; }
-    .project-url {
+    .project-desc {
       font-size: 11px;
       font-weight: 900;
       color: #666;
+      margin-top: 4px;
     }
+    .project-links {
+      display: flex;
+      gap: 8px;
+      flex-shrink: 0;
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .project-links a { color: #666; }
+    .project-links a:hover { color: #000; }
     .empty {
       padding: 40px;
       text-align: center;
@@ -74,9 +86,17 @@
       }
 
       el.innerHTML = projects.map(function(p) {
+        var desc = p.description ? '<div class="project-desc">' + esc(p.description) + '</div>' : '';
+        var links = '<a href="' + esc(p.url) + '" target="_blank">' + esc(p.url.replace(/^https?:\/\//, '')) + '</a>';
+        if (p.github) {
+          links += '<a href="' + esc(p.github) + '" target="_blank">GITHUB</a>';
+        }
         return '<div class="project">' +
-          '<a href="' + esc(p.url) + '" target="_blank" class="project-name">' + esc(p.name) + '</a>' +
-          '<span class="project-url">' + esc(p.url.replace(/^https?:\/\//, '')) + '</span>' +
+          '<div class="project-left">' +
+            '<a href="' + esc(p.url) + '" target="_blank" class="project-name">' + esc(p.name) + '</a>' +
+            desc +
+          '</div>' +
+          '<div class="project-links">' + links + '</div>' +
         '</div>';
       }).join('');
     }).catch(function() {
