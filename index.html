@@ -118,6 +118,11 @@
       d.textContent = s || '';
       return d.innerHTML;
     }
+    function fixUrl(u) {
+      u = (u || '').trim();
+      if (u && !/^https?:\/\//i.test(u)) u = 'https://' + u;
+      return u;
+    }
 
     fetch('/api/projects').then(function(r) { return r.json(); }).then(function(data) {
       var projects = (data.projects || []).sort(function(a, b) {
@@ -131,16 +136,18 @@
       }
 
       el.innerHTML = projects.map(function(p) {
+        var url = fixUrl(p.url);
+        var gh = fixUrl(p.github);
         var desc = p.description ? '<div class="project-desc">' + esc(p.description) + '</div>' : '';
-        var links = '<a href="' + esc(p.url) + '" target="_blank">' + esc(p.url.replace(/^https?:\/\//, '')) + '</a>';
+        var links = '<a href="' + esc(url) + '" target="_blank">' + esc(url.replace(/^https?:\/\//, '')) + '</a>';
         if (p.github) {
-          links += '<a href="' + esc(p.github) + '" target="_blank">GITHUB</a>';
+          links += '<a href="' + esc(gh) + '" target="_blank">GITHUB</a>';
         }
         var img = p.image ? '<img src="' + esc(p.image) + '" class="project-img" alt="' + esc(p.name) + '">' : '';
         return '<article class="project">' +
           img +
           '<div class="project-left">' +
-            '<a href="' + esc(p.url) + '" target="_blank" class="project-name">' + esc(p.name) + '</a>' +
+            '<a href="' + esc(url) + '" target="_blank" class="project-name">' + esc(p.name) + '</a>' +
             desc +
           '</div>' +
           '<div class="project-links">' + links + '</div>' +
