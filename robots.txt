@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://skyhouse-eight.vercel.app/sitemap.xml
+Sitemap: https://thegoodinternet.app/sitemap.xml
