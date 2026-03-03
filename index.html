@@ -3,7 +3,47 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>THE GOOD INTERNET</title>
+  <title>YURI RYBAK — THE GOOD INTERNET</title>
+  <meta name="description" content="Yuri Rybak — software developer, music producer, and creative technologist. Projects, work, and links.">
+  <meta name="author" content="Yuri Rybak">
+  <link rel="canonical" href="https://skyhouse-eight.vercel.app/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="YURI RYBAK — THE GOOD INTERNET">
+  <meta property="og:description" content="Yuri Rybak — software developer, music producer, and creative technologist. Projects, work, and links.">
+  <meta property="og:url" content="https://skyhouse-eight.vercel.app/">
+  <meta property="og:site_name" content="THE GOOD INTERNET">
+
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="YURI RYBAK — THE GOOD INTERNET">
+  <meta name="twitter:description" content="Yuri Rybak — software developer, music producer, and creative technologist. Projects, work, and links.">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Yuri Rybak",
+    "url": "https://skyhouse-eight.vercel.app",
+    "jobTitle": "Software Developer",
+    "knowsAbout": ["Software Development", "Music Production", "Creative Technology"],
+    "sameAs": [
+      "https://github.com/yuribeats"
+    ]
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "THE GOOD INTERNET",
+    "url": "https://skyhouse-eight.vercel.app",
+    "author": {
+      "@type": "Person",
+      "name": "Yuri Rybak"
+    }
+  }
+  </script>
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; border-radius: 0 !important; }
     body {
@@ -22,6 +62,7 @@
       margin-bottom: 20px;
     }
     h1 { font-size: 48px; font-weight: 900; letter-spacing: 2px; }
+    .byline { font-size: 14px; font-weight: 900; margin-top: 8px; color: #666; }
     .project-list { display: flex; flex-direction: column; }
     .project {
       border: 1px solid #000;
@@ -62,11 +103,14 @@
 <body>
   <header>
     <h1>THE GOOD INTERNET</h1>
+    <p class="byline">BY YURI RYBAK</p>
   </header>
 
-  <div id="projects" class="project-list">
-    <div class="loading">LOADING...</div>
-  </div>
+  <main>
+    <div id="projects" class="project-list">
+      <div class="loading">LOADING...</div>
+    </div>
+  </main>
 
   <script>
     function esc(s) {
@@ -92,15 +136,15 @@
         if (p.github) {
           links += '<a href="' + esc(p.github) + '" target="_blank">GITHUB</a>';
         }
-        var img = p.image ? '<img src="' + esc(p.image) + '" class="project-img">' : '';
-        return '<div class="project">' +
+        var img = p.image ? '<img src="' + esc(p.image) + '" class="project-img" alt="' + esc(p.name) + '">' : '';
+        return '<article class="project">' +
           img +
           '<div class="project-left">' +
             '<a href="' + esc(p.url) + '" target="_blank" class="project-name">' + esc(p.name) + '</a>' +
             desc +
           '</div>' +
           '<div class="project-links">' + links + '</div>' +
-        '</div>';
+        '</article>';
       }).join('');
     }).catch(function() {
       document.getElementById('projects').innerHTML =

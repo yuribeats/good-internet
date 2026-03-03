@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://skyhouse-eight.vercel.app/sitemap.xml
