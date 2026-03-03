@@ -5,13 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ADMIN — THE GOOD INTERNET</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      border-radius: 0 !important;
-    }
-
+    * { margin: 0; padding: 0; box-sizing: border-box; border-radius: 0 !important; }
     body {
       font-family: Arial, Helvetica, sans-serif;
       font-weight: 900;
@@ -20,9 +14,7 @@
       color: #000;
       padding: 20px;
     }
-
     a { color: #000; }
-
     header {
       border-bottom: 1px solid #000;
       padding-bottom: 20px;
@@ -31,70 +23,48 @@
       justify-content: space-between;
       align-items: center;
     }
+    h1 { font-size: 32px; font-weight: 900; letter-spacing: 2px; }
+    .back-link { font-size: 12px; font-weight: 900; letter-spacing: 1px; }
+    .count { font-size: 12px; margin-bottom: 20px; }
 
-    h1 {
-      font-size: 32px;
-      font-weight: 900;
-      letter-spacing: 2px;
-    }
-
-    .back-link {
-      font-size: 12px;
-      font-weight: 900;
-      letter-spacing: 1px;
-    }
-
-    .count {
-      font-size: 12px;
-      margin-bottom: 20px;
-    }
-
-    .project {
+    .add-form {
       border: 1px solid #000;
       padding: 16px;
-      margin-bottom: -1px;
+      margin-bottom: 20px;
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
       gap: 8px;
+      flex-wrap: wrap;
+      align-items: flex-end;
     }
-
-    .project-info {
-      flex: 1;
-    }
-
-    .project-name {
-      font-size: 16px;
-      font-weight: 900;
-      margin-bottom: 4px;
-    }
-
-    .project-url {
-      font-size: 11px;
-      color: #666;
-      word-break: break-all;
-    }
-
-    .project-meta {
-      font-size: 11px;
-      margin-top: 4px;
-    }
-
-    .project-tags {
-      display: inline-flex;
-      gap: 4px;
-      margin-left: 8px;
-    }
-
-    .tag {
-      font-size: 9px;
-      font-weight: 900;
-      padding: 2px 6px;
+    .add-form .field { flex: 1; min-width: 150px; }
+    .add-form label { display: block; font-size: 10px; margin-bottom: 4px; }
+    .add-form input {
+      width: 100%;
+      padding: 8px;
       border: 1px solid #000;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 900;
+      font-size: 12px;
+      text-transform: uppercase;
+      outline: none;
+      background: #fff;
+      color: #000;
     }
-
-    .remove-btn {
+    .add-form input:focus { background: #000; color: #fff; }
+    .btn {
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 900;
+      font-size: 11px;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      border: 1px solid #000;
+      background: #000;
+      color: #fff;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn:hover { background: #fff; color: #000; }
+    .btn-outline {
       font-family: Arial, Helvetica, sans-serif;
       font-weight: 900;
       font-size: 11px;
@@ -106,11 +76,47 @@
       cursor: pointer;
       white-space: nowrap;
     }
+    .btn-outline:hover { background: #000; color: #fff; }
 
-    .remove-btn:hover {
-      background: #000;
-      color: #fff;
+    .project {
+      border: 1px solid #000;
+      padding: 16px;
+      margin-bottom: -1px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
     }
+    .project-info { flex: 1; min-width: 0; }
+    .project-name { font-size: 16px; font-weight: 900; margin-bottom: 2px; }
+    .project-url { font-size: 11px; color: #666; word-break: break-all; }
+    .project-actions { display: flex; gap: 4px; flex-shrink: 0; }
+
+    .edit-row {
+      border: 1px solid #000;
+      padding: 16px;
+      margin-bottom: -1px;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      background: #f5f5f5;
+    }
+    .edit-row .field { flex: 1; min-width: 150px; }
+    .edit-row label { display: block; font-size: 10px; margin-bottom: 4px; }
+    .edit-row input {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #000;
+      font-family: Arial, Helvetica, sans-serif;
+      font-weight: 900;
+      font-size: 12px;
+      text-transform: uppercase;
+      outline: none;
+      background: #fff;
+      color: #000;
+    }
+    .edit-row input:focus { background: #000; color: #fff; }
 
     .empty {
       padding: 40px;
@@ -118,16 +124,13 @@
       border: 1px solid #000;
       font-size: 14px;
     }
-
     .gate {
       min-height: 60vh;
       display: flex;
       align-items: center;
       justify-content: center;
     }
-
     .gate-box { text-align: center; }
-
     .gate-input {
       width: 240px;
       padding: 10px;
@@ -141,9 +144,7 @@
       background: #fff;
       color: #000;
     }
-
     .gate-input:focus { background: #000; color: #fff; }
-
     .gate-btn {
       display: block;
       width: 240px;
@@ -158,16 +159,8 @@
       text-transform: uppercase;
       cursor: pointer;
     }
-
     .gate-btn:hover { background: #fff; color: #000; }
-
-    .gate-error {
-      margin-top: 12px;
-      font-size: 11px;
-      color: #999;
-      height: 16px;
-    }
-
+    .gate-error { margin-top: 12px; font-size: 11px; color: #999; height: 16px; }
     .content { display: none; }
   </style>
 </head>
@@ -183,8 +176,20 @@
   <div class="content" id="content">
     <header>
       <h1>ADMIN</h1>
-      <a href="index.html" class="back-link">&larr; BACK</a>
+      <a href="/" class="back-link">&larr; BACK</a>
     </header>
+
+    <div class="add-form">
+      <div class="field">
+        <label>NAME</label>
+        <input type="text" id="addName" placeholder="PROJECT NAME">
+      </div>
+      <div class="field">
+        <label>URL</label>
+        <input type="url" id="addUrl" placeholder="HTTPS://...">
+      </div>
+      <button class="btn" id="addBtn">ADD</button>
+    </div>
 
     <div class="count" id="count"></div>
     <div id="projects"></div>
@@ -208,7 +213,9 @@
         document.getElementById('passInput').focus();
       }
     }
+
     var projects = [];
+    var editingIndex = -1;
 
     function esc(s) {
       var d = document.createElement('div');
@@ -225,40 +232,82 @@
 
     function render() {
       var el = document.getElementById('projects');
-      document.getElementById('count').textContent = projects.length + ' PROJECTS';
+      document.getElementById('count').textContent = projects.length + ' SITES';
 
       if (projects.length === 0) {
-        el.innerHTML = '<div class="empty">NO PROJECTS</div>';
+        el.innerHTML = '<div class="empty">NO SITES</div>';
         return;
       }
 
       el.innerHTML = projects.map(function(p, i) {
+        if (i === editingIndex) {
+          return '<div class="edit-row">' +
+            '<div class="field"><label>NAME</label><input type="text" id="editName" value="' + esc(p.name) + '"></div>' +
+            '<div class="field"><label>URL</label><input type="url" id="editUrl" value="' + esc(p.url) + '"></div>' +
+            '<button class="btn" onclick="saveEdit(' + i + ')">SAVE</button>' +
+            '<button class="btn-outline" onclick="cancelEdit()">CANCEL</button>' +
+          '</div>';
+        }
         return '<div class="project">' +
           '<div class="project-info">' +
             '<div class="project-name">' + esc(p.name) + '</div>' +
             '<div class="project-url">' + esc(p.url) + '</div>' +
-            '<div class="project-meta">BY ' + esc(p.submittedBy) +
-              '<span class="project-tags">' +
-                (p.tags || []).map(function(t) { return '<span class="tag">' + esc(t) + '</span>'; }).join('') +
-              '</span>' +
-            '</div>' +
           '</div>' +
-          '<button class="remove-btn" onclick="remove(' + i + ')">REMOVE</button>' +
+          '<div class="project-actions">' +
+            '<button class="btn-outline" onclick="startEdit(' + i + ')">EDIT</button>' +
+            '<button class="btn-outline" onclick="remove(' + i + ')">REMOVE</button>' +
+          '</div>' +
         '</div>';
       }).join('');
     }
 
-    function remove(index) {
-      if (!confirm('REMOVE THIS PROJECT?')) return;
+    document.getElementById('addBtn').addEventListener('click', function() {
+      var name = document.getElementById('addName').value.trim();
+      var url = document.getElementById('addUrl').value.trim();
+      if (!name || !url) return;
       fetch('/api/projects', {
-        method: 'DELETE',
+        method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ index: index })
+        body: JSON.stringify({ name: name, url: url })
       }).then(function() {
+        document.getElementById('addName').value = '';
+        document.getElementById('addUrl').value = '';
+        load();
+      });
+    });
+
+    function startEdit(i) {
+      editingIndex = i;
+      render();
+    }
+
+    function cancelEdit() {
+      editingIndex = -1;
+      render();
+    }
+
+    function saveEdit(i) {
+      var name = document.getElementById('editName').value.trim();
+      var url = document.getElementById('editUrl').value.trim();
+      if (!name || !url) return;
+      fetch('/api/projects', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ index: i, name: name, url: url })
+      }).then(function() {
+        editingIndex = -1;
         load();
       });
     }
 
+    function remove(i) {
+      if (!confirm('REMOVE THIS SITE?')) return;
+      fetch('/api/projects', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ index: i })
+      }).then(function() { load(); });
+    }
   </script>
 </body>
 </html>
